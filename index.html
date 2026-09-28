@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<meta name="theme-color" content="#07111c">
+
+<title>27-0 Rugby League</title>
+
+<style>
+
+*{box-sizing:border-box}
+
+body{
+
+ margin:0;
+
+ background:#07111c;
+
+ color:white;
+
+ font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+
+}
+
+button{font:inherit;cursor:pointer}
+
+.app{max-width:900px;margin:auto;padding:18px}
+
+.logo{font-size:48px;font-weight:900}
+
+.logo span{color:#39e683}
+
+.card{
+
+ background:#102033;
+
+ border:1px solid #29445d;
+
+ border-radius:20px;
+
+ padding:16px;
+
+ margin-top:14px;
+
+}
+
+.muted{color:#9fb1c3}
+
+.clubs{
+
+ display:grid;
+
+ grid-template-columns:repeat(2,1fr);
+
+ gap:9px;
+
+}
+
+.club,.btn{
+
+ background:#0b1725;
+
+ color:white;
+
+ border:1px solid #36536d;
+
+ border-radius:13px;
+
+ padding:13px;
+
+ font-weight:800;
+
+}
+
+.club.selected{
+
+ border-color:#39e683;
+
+ background:#17462e;
+
+}
+
+.primary{
+
+ background:#39e683;
+
+ color:#06150d;
+
+ border:0;
+
+}
+
+.game{display:none}
+
+.game.active{display:block}
+
+.rollers{
+
+ display:grid;
+
+ grid-template-columns:1fr 1fr;
+
+ gap:10px;
+
+}
+
+.roller{
+
+ background:#0b1725;
+
+ border-radius:15px;
+
+ padding:15px;
+
+ text-align:center;
+
+}
+
+.result{
+
+ font-size:23px;
+
+ font-weight:900;
+
+ margin-top:5px;
+
+}
+
+.actions{
+
+ display:grid;
+
+ grid-template-columns:1fr 1fr 1fr;
+
+ gap:7px;
+
+ margin-top:10px;
+
+}
+
+.status{
+
+ margin-top:10px;
+
+ padding:12px;
+
+ border-radius:12px;
+
+ background:#0b1725;
+
+}
+
+.players{display:grid;gap:8px;margin-top:10px}
+
+.player{
+
+ display:flex;
+
+ justify-content:space-between;
+
+ align-items:center;
+
+ gap:10px;
+
+ background:#0b1725;
+
+ border:1px solid #29445d;
+
+ border-radius:13px;
+
+ padding:11px;
+
+}
+
+.pick{
+
+ border:0;
+
+ border-radius:10px;
+
+ padding:10px;
+
+ font-weight:900;
+
+ background:#39e683;
+
+}
+
+.field{
+
+ position:relative;
+
+ height:620px;
+
+ border-radius:20px;
+
+ overflow:hidden;
+
+ margin-top:12px;
+
+ background:
+
+ repeating-linear-gradient(
+
+ 0deg,
+
+ #ffffff08 0 44px,
+
+ #ffffff25 44px 46px
+
+ ),
+
+ #17683d;
+
+}
+
+.slot{
+
+ position:absolute;
+
+ transform:translate(-50%,-50%);
+
+ width:76px;
+
+ text-align:center;
+
+ font-size:9px;
+
+}
+
+.jersey{
+
+ margin:auto;
+
+ width:47px;
+
+ height:54px;
+
+ border:2px solid #ffffffaa;
+
+ background:#ffffff20;
+
+ clip-path:polygon(
+
+ 14% 0,86% 0,100% 22%,86% 33%,
+
+ 86% 100%,14% 100%,14% 33%,0 22%
+
+ );
+
+ display:flex;
+
+ align-items:center;
+
+ justify-content:center;
+
+ font-size:14px;
+
+ font-weight:900;
+
+}
+
+.slot.filled .jersey{
+
+ background:#39e683;
+
+ color:#06150d;
+
+}
+
+.bench{
+
+ display:grid;
+
+ grid-template-columns:repeat(4,1fr);
+
+ gap:6px;
+
+ margin-top:8px;
+
+}
+
+.bench div{
+
+ min-height:65px;
+
+ padding:8px 3px;
+
+ text-align:center;
+
+ border:1px dashed #60778c;
+
+ border-radius:10px;
+
+ font-size:10px;
+
+}
+
+@media(min-width:650px){
+
+ .clubs{grid-template-columns:repeat(3,1fr)}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="logo">27<span>–</span>0</div>
+
+<section id="home" class="card">
+
+<h1>Rugby League Random Draft</h1>
+
+<p class="muted">
+
+Build your ultimate Australian rugby league 17.
+
+Roll an era and a position, then choose your player.
+
+</p>
+
+<h3>Choose your club</h3>
+
+<div id="clubs" class="clubs"></div>
+
+<button id="start" class="btn primary"
+
+style="width:100%;margin-top:12px">
+
+CHOOSE A CLUB
+
+</button>
+
+<button id="quick" class="btn"
+
+style="width:100%;margin-top:8px">
+
+QUICK START — ALL STARS
+
+</button>
+
+</section>
+
+<section id="game" class="game">
+
+<div class="card">
+
+<h2 id="teamTitle">Your 17</h2>
+
+<div class="rollers">
+
+ <div class="roller">
+
+  <small>ERA</small>
+
+  <div id="era" class="result">—</div>
+
+ </div>
+
+ <div class="roller">
+
+  <small>POSITION</small>
+
+  <div id="position" class="result">—</div>
+
+ </div>
+
+</div>
+
+<div class="actions">
+
+<button id="rollEra" class="btn">ROLL ERA</button>
+
+<button id="rollPosition" class="btn">ROLL POSITION</button>
+
+<button id="rollBoth" class="btn primary">ROLL BOTH</button>
+
+</div>
+
+<div id="status" class="status">
+
+Roll both to begin your draft.
+
+</div>
+
+<div id="players" class="players"></div>
+
+</div>
+
+<div class="card">
+
+<h2>Your Team — <span id="count">0 / 17</span></h2>
+
+<div id="field" class="field"></div>
+
+<div id="bench" class="bench"></div>
+
+<button id="restart" class="btn"
+
+style="width:100%;margin-top:12px">
+
+RESTART DRAFT
+
+</button>
+
+</div>
+
+</section>
+
+</div>
+
+<script>
+
+const clubs=[
+
+"Broncos","Bulldogs","Cowboys","Dragons",
+
+"Eels","Knights","Panthers","Rabbitohs",
+
+"Raiders","Roosters","Sea Eagles","Sharks",
+
+"Storm","Tigers","Titans","Warriors","Dolphins"
+
+];
+
+const eras=[
+
+"1950s","1960s","1970s","1980s",
+
+"1990s","2000s","2010s","2020s"
+
+];
+
+const positions=[
+
+"Fullback","Wing","Centre","Five-eighth",
+
+"Halfback","Prop","Hooker","Second row","Lock"
+
+];
+
+const players={
+
+"Fullback":[
+
+"Clive Churchill","Graeme Langlands","Garry Jack",
+
+"Darren Lockyer","Billy Slater","James Tedesco",
+
+"Tom Trbojevic","Dylan Edwards"
+
+],
+
+"Wing":[
+
+"Brian Bevan","Ken Irvine","Kerry Boustead",
+
+"Eric Grothe","Wendell Sailor","Hazem El Masri",
+
+"Brett Morris","Brian To'o"
+
+],
+
+"Centre":[
+
+"Dave Brown","Reg Gasnier","Bob Fulton",
+
+"Mal Meninga","Steve Renouf","Justin Hodges",
+
+"Greg Inglis","Stephen Crichton"
+
+],
+
+"Five-eighth":[
+
+"Vic Hey","Arthur Summons","Bob Fulton",
+
+"Wally Lewis","Brad Fittler","Darren Lockyer",
+
+"James Maloney","Cameron Munster"
+
+],
+
+"Halfback":[
+
+"Keith Holman","Bob Bugden","Tommy Raudonikis",
+
+"Peter Sterling","Allan Langer","Andrew Johns",
+
+"Johnathan Thurston","Nathan Cleary"
+
+],
+
+"Prop":[
+
+"Kel O'Shea","Kevin Ryan","Bob O'Reilly",
+
+"Glenn Lazarus","Shane Webcke","Steve Price",
+
+"Matt Scott","Payne Haas"
+
+],
+
+"Hooker":[
+
+"Ken Kearney","Ian Walsh","George Piggins",
+
+"Royce Simmons","Steve Walters","Cameron Smith",
+
+"Jake Friend","Harry Grant"
+
+],
+
+"Second row":[
+
+"Frank Burge","Dick Thornett","Rod Reddy",
+
+"Paul Sironen","Gordon Tallis","Craig Fitzgibbon",
+
+"Boyd Cordner","Angus Crichton"
+
+],
+
+"Lock":[
+
+"Col Donohoe","Johnny Raper","Ron Coote",
+
+"Ray Price","Bradley Clyde","Ben Kennedy",
+
+"Paul Gallen","Isaah Yeo"
+
+]
+
+};
+
+const slots=[
+
+["Prop 1","Prop",36,20],
+
+["Hooker","Hooker",50,18],
+
+["Prop 2","Prop",64,20],
+
+["Second row 1","Second row",39,33],
+
+["Second row 2","Second row",61,33],
+
+["Lock","Lock",50,45],
+
+["Halfback","Halfback",43,57],
+
+["Five-eighth","Five-eighth",57,57],
+
+["Centre 1","Centre",28,69],
+
+["Centre 2","Centre",72,69],
+
+["Wing 1","Wing",12,80],
+
+["Wing 2","Wing",88,80],
+
+["Fullback","Fullback",50,91]
+
+];
+
+const bench=[
+
+"Interchange 1",
+
+"Interchange 2",
+
+"Interchange 3",
+
+"Interchange 4"
+
+];
+
+let club="";
+
+let currentEra="";
+
+let currentPosition="";
+
+let squad={};
+
+const $=id=>document.getElementById(id);
+
+function random(arr){
+
+ return arr[Math.floor(Math.random()*arr.length)];
+
+}
+
+function initials(name){
+
+ return name.split(" ")
+
+ .map(x=>x[0])
+
+ .join("")
+
+ .slice(0,3);
+
+}
+
+function renderClubs(){
+
+ $("clubs").innerHTML="";
+
+ clubs.forEach(c=>{
+
+  const b=document.createElement("button");
+
+  b.className="club"+(club===c?" selected":"");
+
+  b.textContent=c;
+
+  b.addEventListener("click",()=>{
+
+   club=c;
+
+   renderClubs();
+
+   $("start").textContent="START AS "+c.toUpperCase();
+
+  });
+
+  $("clubs").appendChild(b);
+
+ });
+
+}
+
+function startGame(selectedClub){
+
+ if(selectedClub) club=selectedClub;
+
+ if(!club){
+
+  alert("Choose a club first.");
+
+  return;
+
+ }
+
+ $("home").style.display="none";
+
+ $("game").classList.add("active");
+
+ $("teamTitle").textContent=club+" — Your 17";
+
+ renderTeam();
+
+}
+
+function openSlot(position){
+
+ const fieldSlot=slots.find(
+
+  s=>s[1]===position && !squad[s[0]]
+
+ );
+
+ if(fieldSlot) return fieldSlot[0];
+
+ return bench.find(b=>!squad[b]);
+
+}
+
+function renderTeam(){
+
+ $("field").innerHTML=slots.map(s=>{
+
+  const selected=squad[s[0]];
+
+  return `
+
+  <div class="slot ${selected?"filled":""}"
+
+       style="left:${s[2]}%;top:${s[3]}%">
+
+   <div class="jersey">
+
+    ${selected?initials(selected):""}
+
+   </div>
+
+   <b>${s[0]}</b>
+
+   <div>${selected||"—"}</div>
+
+  </div>`;
+
+ }).join("");
+
+ $("bench").innerHTML=bench.map(b=>{
+
+  const selected=squad[b];
+
+  return `
+
+  <div>
+
+   <small>${b}</small><br>
+
+   <b>${selected?initials(selected):"—"}</b><br>
+
+   <small>${selected||"EMPTY"}</small>
+
+  </div>`;
+
+ }).join("");
+
+ $("count").textContent=
+
+ Object.keys(squad).length+" / 17";
+
+}
+
+function rollEra(){
+
+ currentEra=random(eras);
+
+ $("era").textContent=currentEra;
+
+ showPlayers();
+
+}
+
+function rollPosition(){
+
+ const available=
+
+ positions.filter(p=>openSlot(p));
+
+ if(!available.length){
+
+  $("status").textContent="Your 17 is complete!";
+
+  return;
+
+ }
+
+ currentPosition=random(available);
+
+ $("position").textContent=currentPosition;
+
+ showPlayers();
+
+}
+
+function showPlayers(){
+
+ if(!currentEra || !currentPosition) return;
+
+ const pool=players[currentPosition];
+
+ $("status").innerHTML=
+
+ `Rolled <b>${currentEra}</b> +
+
+ <b>${currentPosition}</b>.
+
+ Choose your player.`;
+
+ $("players").innerHTML="";
+
+ pool.forEach((name,index)=>{
+
+  if(Object.values(squad).includes(name)) return;
+
+  const card=document.createElement("div");
+
+  card.className="player";
+
+  const rating=88+
+
+  ((eras.indexOf(currentEra)+index*3)%12);
+
+  card.innerHTML=`
+
+  <div>
+
+   <b>${name}</b><br>
+
+   <small class="muted">
+
+   ${currentPosition} · ${currentEra} · OVR ${rating}
+
+   </small>
+
+  </div>
+
+  <button class="pick">DRAFT</button>
+
+  `;
+
+  card.querySelector(".pick")
+
+  .addEventListener("click",()=>draft(name));
+
+  $("players").appendChild(card);
+
+ });
+
+}
+
+function draft(name){
+
+ const slot=openSlot(currentPosition);
+
+ if(!slot) return;
+
+ squad[slot]=name;
+
+ renderTeam();
+
+ currentEra="";
+
+ currentPosition="";
+
+ $("era").textContent="—";
+
+ $("position").textContent="—";
+
+ $("players").innerHTML="";
+
+ if(Object.keys(squad).length===17){
+
+  $("status").textContent=
+
+  "Your 17 is complete!";
+
+ }else{
+
+  $("status").textContent=
+
+  "Player drafted. Roll again.";
+
+ }
+
+}
+
+$("start").addEventListener(
+
+"click",()=>startGame()
+
+);
+
+$("quick").addEventListener(
+
+"click",()=>startGame("All Stars")
+
+);
+
+$("rollEra").addEventListener(
+
+"click",rollEra
+
+);
+
+$("rollPosition").addEventListener(
+
+"click",rollPosition
+
+);
+
+$("rollBoth").addEventListener(
+
+"click",()=>{
+
+  rollEra();
+
+  rollPosition();
+
+ }
+
+);
+
+$("restart").addEventListener(
+
+"click",()=>{
+
+  squad={};
+
+  currentEra="";
+
+  currentPosition="";
+
+  $("era").textContent="—";
+
+  $("position").textContent="—";
+
+  $("players").innerHTML="";
+
+  $("status").textContent=
+
+  "Draft restarted. Roll both to begin.";
+
+  renderTeam();
+
+ }
+
+);
+
+renderClubs();
+
+renderTeam();
+
+</script>
+
+</body>
+
+</html>
